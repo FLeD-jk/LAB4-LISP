@@ -1,20 +1,18 @@
 (defun add-next-fn (&key transform)
-  (lambda (current next)
-    (let ((current-value (if transform (funcall transform current) current))
-          (next-value (if (and next transform) (funcall transform next) next)))
-      (cons current-value next-value))))
+  (lambda (lst)
+    (let ((shifted-lst (append (cdr lst) (list nil))))
+      (mapcar (lambda (current next)
+                (let ((current-value (if transform (funcall transform current) current))
+                      (next-value (if (and next transform) (funcall transform next) next)))
+                  (cons current-value next-value)))
+              lst
+              shifted-lst))))
 
-(defun pair-elements-with-mapcar (lst &key transform)
-  (mapcar (add-next-fn :transform transform)
-          lst
-          (append (cdr lst) (list nil)))) ; Додаємо NIL до кінця списку
-
-;; Приклад використання
-(print (pair-elements-with-mapcar '(1 2 3)))
+(print (funcall (add-next-fn) '(1 2 3)))
 ;; => ((1 . 2) (2 . 3) (3 . NIL))
 
-(print (pair-elements-with-mapcar '(1 2 3) :transform #'1+))
+(print (funcall (add-next-fn :transform #'1+) '(1 2 3)))
 ;; => ((2 . 3) (3 . 4) (4 . NIL))
 
-(print (pair-elements-with-mapcar '(9 16 25) :transform #'sqrt))
-;; => ((2 . 3) (3 . 4) (4 . NIL))
+(print (funcall (add-next-fn :transform #'sqrt) '(9 16 25)))
+;; => ((3 . 4) (4 . 5) (5 . NIL))
