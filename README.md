@@ -25,18 +25,18 @@
 ## Лістинг реалізації першої частини завдання
 ```lisp
 (defun shell-sorting (lst n gap i key test)
-  (if (>= gap 1)
-      (if (< i n)
-          (let ((j i))
-            (if (and (>= j gap)
-                     (funcall test (funcall key (nth (- j gap) lst)) 
-                              (funcall key (nth j lst))))
-                (progn
-                  (rotatef (nth j lst) (nth (- j gap) lst))
-                  (shell-sorting lst n gap (- j gap) key test))
-                (shell-sorting lst n gap (+ i 1) key test)))
-          (shell-sorting lst n (floor (/ gap 2)) 0 key test))
-      lst))
+           (if (>= gap 1)
+               (if (< i n)
+                   (let ((j i))
+                     (if (and (>= j gap)
+                              (funcall test (funcall key (nth (- j gap) lst)) 
+                                       (funcall key (nth j lst))))
+                         (progn
+                           (rotatef (nth j lst) (nth (- j gap) lst))
+                           (shell-sorting lst n gap (- j gap) key test))
+                         (shell-sorting lst n gap (+ i 1) key test)))
+                   (shell-sorting lst n (floor (/ gap 2)) 0 key test))
+               lst))
 
 (defun shell-sorting-functional (lst &key (key #'identity) (test #'>))
   (let ((n (length lst)))
