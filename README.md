@@ -58,12 +58,36 @@
   (check-shell-sorting-functional "test 1" '(346 23 0 32 44 76 2 120 34  32 65) '(0 2 23 32 32 34 44 65 76 120 346))
   (check-shell-sorting-functional "test 2" '(0 0 2 56 78 21 34 90 6751 1 1 1 -1 1) '(-1 0 0 1 1 1 1 2 21 34 56 78 90 6751))
   (check-shell-sorting-functional "test 3" '(3 4 2 9 34) '(2 3 4 9 34))
-    
+  
+  (check-shell-sorting-functional "Recursive: Sorting with key as abs" '(3 -1 -4 1 -5 9 -2 6 -5 3 -5) '(-1 1 -2 3 3 -4 -5 -5 -5 6 9) :key #'abs)
+  (check-shell-sorting-functional "Recursive: Sorting with key as abs in ascending order (<)" '(3 -1 -4 1 -5 9 -2 6 -5 3 -5) '(9 6 -5 -5 -5 -4 3 3 -2 -1 1) :key #'abs :test #'<)
+  (check-shell-sorting-functional "Recursive: Sorting with key as abs in descending order" '(3 -1 -4 1 -5 9 -2 6 -5 3 -5) '(-1 1 -2 3 3 -4 -5 -5 -5 6 9) :key #'abs :test #'>)
+  
+  (check-shell-sorting-functional "Recursive: Default test function (<=)" '(3 2 5 4 1) '(1 2 3 4 5)  :test #'>)
+  (check-shell-sorting-functional "Recursive: Descending order" '(3 2 5 4 1) '(5 4 3 2 1)  :test #'<)
+  (check-shell-sorting-functional "Recursive: Custom sorting by car" '((2 . 3) (1 . 2) (4 . 5) (3 . 1))
+                                  '((1 . 2) (2 . 3) (3 . 1) (4 . 5))                    
+                                  :key #'car)
+  (check-shell-sorting-functional "Recursive: Custom sorting by cdr" '((2 . 3) (1 . 2) (4 . 5) (3 . 1))
+                                  '((3 . 1) (1 . 2) (2 . 3) (4 . 5))
+                                  :key #'cdr)
   (format t "EnD~%"))
 ```
 ### Тестування першої частини
 ```lisp
-<Виклик і результат виконання тестів>
+CL-USER> (test-shell-sorting-functional)
+Start testing shell-sorting-functional function
+test 1 passed! Expected: (0 2 23 32 32 34 44 65 76 120 346) Obtained: (0 2 23 32 32 34 44 65 76 120 346)
+test 2 passed! Expected: (-1 0 0 1 1 1 1 2 21 34 56 78 90 6751) Obtained: (-1 0 0 1 1 1 1 2 21 34 56 78 90 6751)
+test 3 passed! Expected: (2 3 4 9 34) Obtained: (2 3 4 9 34)
+Recursive: Sorting with key as abs passed! Expected: (-1 1 -2 3 3 -4 -5 -5 -5 6 9) Obtained: (-1 1 -2 3 3 -4 -5 -5 -5 6 9)
+Recursive: Sorting with key as abs in ascending order (<) passed! Expected: (9 6 -5 -5 -5 -4 3 3 -2 -1 1) Obtained: (9 6 -5 -5 -5 -4 3 3 -2 -1 1)
+Recursive: Sorting with key as abs in descending order passed! Expected: (-1 1 -2 3 3 -4 -5 -5 -5 6 9) Obtained: (-1 1 -2 3 3 -4 -5 -5 -5 6 9)
+Recursive: Default test function (<=) passed! Expected: (1 2 3 4 5) Obtained: (1 2 3 4 5)
+Recursive: Descending order passed! Expected: (5 4 3 2 1) Obtained: (5 4 3 2 1)
+Recursive: Custom sorting by car passed! Expected: ((1 . 2) (2 . 3) (3 . 1) (4 . 5)) Obtained: ((1 . 2) (2 . 3) (3 . 1) (4 . 5))
+Recursive: Custom sorting by cdr passed! Expected: ((3 . 1) (1 . 2) (2 . 3) (4 . 5)) Obtained: ((3 . 1) (1 . 2) (2 . 3) (4 . 5))
+EnD
 ```
 ## Варіант другої частини - 3
 Написати функцію add-next-fn , яка має один ключовий параметр — функцію
@@ -83,13 +107,42 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 
 ## Лістинг функції з використанням деструктивного підходу
 ```lisp
-<Лістинг реалізації з використанням деструктивного підходу>
+(Defun Add-Next-Fn (&Key Transform)
+  (Lambda (Current Next)
+    (Let ((Current-Value (If Transform (Funcall Transform Current) current))
+          (next-value (if (and next transform) (funcall transform next) next)))
+      (cons current-value next-value))))
+
+(defun pair-elements-with-mapcar (lst &key transform)
+  (mapcar (add-next-fn :transform transform)
+          lst
+          (append (cdr lst) (list nil)))) 
 ```
 ### Тестові набори та утиліти
 ```lisp
-<Лістинг реалізації утилітних тестових функцій та тестових наборів>
+(defun check-pair-elements-with-mapcar (name input expected &key transform)
+  "Execute shell-sorting-functional on input, compare result with expected and print comparison status"
+  (let ((result (pair-elements-with-mapcar input :transform transform)))
+    (format t "~:[~a failed! Expected: ~a Obtained: ~a~;~a passed! Expected: ~a Obtained: ~a~]~%"
+            (equal result expected)
+            name expected result)))
+
+
+(defun test-pair-elements-with-mapcar ()
+  (format t "Start testing shell-sorting-functional function~%")
+  (check-pair-elements-with-mapcar "Сalling a function without a transform" '(1 2 3) '((1 . 2) (2 . 3) (3 . NIL)))
+  (check-pair-elements-with-mapcar "Сalling a function with transform 1+" '(1 2 3) '((2 . 3) (3 . 4) (4 . NIL)) :transform #'1+)
+  (check-pair-elements-with-mapcar "Сalling a function with transform 5+"  '(1 5 10 15) '((6 . 10) (10 . 15) (15 . 20) (20))  :transform (lambda (x) (+ x 5)))
+  (check-pair-elements-with-mapcar "Сalling a function with transform sqrt"  '(9 16 25) '((3 . 4) (4 . 5) (5)) :transform #'sqrt)
+  (format t "EnD~%"))
 ```
 ### Тестування
 ```lisp
-<Виклик і результат виконання тестів>
+CL-USER> (test-pair-elements-with-mapcar)
+Start testing shell-sorting-functional function
+Сalling a function without a transform passed! Expected: ((1 . 2) (2 . 3) (3)) Obtained: ((1 . 2) (2 . 3) (3))
+Сalling a function with transform 1+ passed! Expected: ((2 . 3) (3 . 4) (4)) Obtained: ((2 . 3) (3 . 4) (4))
+Сalling a function with transform 5+ passed! Expected: ((6 . 10) (10 . 15) (15 . 20) (20)) Obtained: ((6 . 10) (10 . 15) (15 . 20) (20))
+Сalling a function with transform sqrt passed! Expected: ((3 . 4) (4 . 5) (5)) Obtained: ((3 . 4) (4 . 5) (5))
+EnD
 ```
