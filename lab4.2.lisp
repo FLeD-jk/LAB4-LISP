@@ -1,18 +1,29 @@
 (defun add-next-fn (&key transform)
-  (lambda (lst)
-    (let ((shifted-lst (append (cdr lst) (list nil))))
-      (mapcar (lambda (current next)
-                (let ((current-value (if transform (funcall transform current) current))
-                      (next-value (if (and next transform) (funcall transform next) next)))
-                  (cons current-value next-value)))
-              lst
-              shifted-lst))))
+  (lambda (current next)
+    (let ((current-value (if transform (funcall transform current) current))
+          (next-value (if (and next transform) (funcall transform next) next)))
+      (cons current-value next-value))))
 
-(print (funcall (add-next-fn) '(1 2 3)))
-;; => ((1 . 2) (2 . 3) (3 . NIL))
+(defun pair-elements-with-mapcar (lst &key transform)
+  (mapcar (add-next-fn :transform transform)
+          lst
+          (append (cdr lst) (list nil)))) 
 
-(print (funcall (add-next-fn :transform #'1+) '(1 2 3)))
-;; => ((2 . 3) (3 . 4) (4 . NIL))
+(defun check-pair-elements-with-mapcar (name input expected &key transform)
+  "Execute shell-sorting-functional on input, compare result with expected and print comparison status"
+  (let ((result (pair-elements-with-mapcar input :transform transform)))
+    (format t "~:[~a failed! Expected: ~a Obtained: ~a~;~a passed! Expected: ~a Obtained: ~a~]~%"
+            (equal result expected)
+            name expected result)))
 
-(print (funcall (add-next-fn :transform #'sqrt) '(9 16 25)))
-;; => ((3 . 4) (4 . 5) (5 . NIL))
+
+(defun test-pair-elements-with-mapcar ()
+  (format t "Start testing shell-sorting-functional function~%")
+  (check-pair-elements-with-mapcar "Сalling a function without a transform" '(1 2 3) '((1 . 2) (2 . 3) (3 . NIL)))
+  (check-pair-elements-with-mapcar "Сalling a function with transform 1+" '(1 2 3) '((2 . 3) (3 . 4) (4 . NIL)) :transform #'1+)
+  (check-pair-elements-with-mapcar "Сalling a function with transform 5+"  '(1 5 10 15) '((6 . 10) (10 . 15) (15 . 20) (20))  :transform (lambda (x) (+ x 5)))
+  (check-pair-elements-with-mapcar "Сalling a function with transform sqrt"  '(9 16 25) '((3 . 4) (4 . 5) (5)) :transform #'sqrt)
+  (format t "EnD~%"))
+
+
+(test-pair-elements-with-mapcar)
