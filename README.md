@@ -101,7 +101,7 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 
 ## Лістинг реалізації другої частини завдання
 ```lisp
-(Defun Add-Next-Fn (&Key Transform)
+(defun Add-Next-Fn (&Key Transform)
   (Lambda (Current Next)
     (Let ((Current-Value (If Transform (Funcall Transform Current) current))
           (next-value (if (and next transform) (funcall transform next) next)))
