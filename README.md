@@ -134,7 +134,7 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 ### Тестування другої частини 
 ```lisp
 CL-USER> (test-pair-elements-with-mapcar)
-Start testing  add-next-fn function
+Start testing add-next-fn function
 Сalling a function without a transform passed! Expected: ((1 . 2) (2 . 3) (3)) Obtained: ((1 . 2) (2 . 3) (3))
 Сalling a function with transform 1+ passed! Expected: ((2 . 3) (3 . 4) (4)) Obtained: ((2 . 3) (3 . 4) (4))
 Сalling a function with transform 5+ passed! Expected: ((6 . 10) (10 . 15) (15 . 20) (20)) Obtained: ((6 . 10) (10 . 15) (15 . 20) (20))
