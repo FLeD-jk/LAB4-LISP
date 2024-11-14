@@ -11,6 +11,7 @@
                          (shell-sorting lst n gap (+ i 1) key test)))
                    (shell-sorting lst n (floor (/ gap 2)) 0 key test))
                lst))
+
 (defun shell-sorting-functional (lst &key (key #'identity) (test #'<))
   (let ((n (length lst)))
     (shell-sorting lst n (floor (/ n 2)) 0 key test)))
