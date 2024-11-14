@@ -1,6 +1,6 @@
-(defun add-next-fn (&key transform)
-  (lambda (current next)
-    (let ((current-value (if transform (funcall transform current) current))
+(Defun Add-Next-Fn (&Key Transform)
+  (Lambda (Current Next)
+    (Let ((Current-Value (If Transform (Funcall Transform Current) current))
           (next-value (if (and next transform) (funcall transform next) next)))
       (cons current-value next-value))))
 
