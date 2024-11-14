@@ -105,7 +105,7 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 ((2 . 3) (3 . 4) (4 . NIL))
 ```
 
-## Лістинг функції з використанням деструктивного підходу
+## Лістинг реалізації другої частини завдання
 ```lisp
 (Defun Add-Next-Fn (&Key Transform)
   (Lambda (Current Next)
@@ -118,7 +118,7 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
           lst
           (append (cdr lst) (list nil)))) 
 ```
-### Тестові набори та утиліти
+### Тестові набори та утиліти другої частини 
 ```lisp
 (defun check-pair-elements-with-mapcar (name input expected &key transform)
   "Execute shell-sorting-functional on input, compare result with expected and print comparison status"
@@ -136,7 +136,7 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
   (check-pair-elements-with-mapcar "Сalling a function with transform sqrt"  '(9 16 25) '((3 . 4) (4 . 5) (5)) :transform #'sqrt)
   (format t "EnD~%"))
 ```
-### Тестування
+### Тестування другої частини 
 ```lisp
 CL-USER> (test-pair-elements-with-mapcar)
 Start testing shell-sorting-functional function
