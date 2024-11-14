@@ -37,14 +37,14 @@
                          (shell-sorting lst n gap (+ i 1) key test)))
                    (shell-sorting lst n (floor (/ gap 2)) 0 key test))
                lst))
-(defun shell-sorting-functional (lst &key (key #'identity) (test #'>))
+(defun shell-sorting-functional (lst &key (key #'identity) (test #'<))
   (let ((n (length lst)))
     (shell-sorting lst n (floor (/ n 2)) 0 key test)))
 ```
 
 ### Тестові набори та утиліти першої частини
 ```lisp
-(defun check-shell-sorting-functional (name input expected &key (key #'identity) (test #'>) )
+(defun check-shell-sorting-functional (name input expected &key (key #'identity) (test #'<) )
   "Execute shell-sorting-functional on input, compare result with expected and print comparison status"
   (let ((result (shell-sorting-functional input :key key :test test))) 
     (format t "~:[~a failed! Expected: ~a Obtained: ~a~;~a passed! Expected: ~a Obtained: ~a~]~%"
