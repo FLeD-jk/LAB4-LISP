@@ -102,22 +102,20 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 
 ## Лістинг реалізації другої частини завдання
 ```lisp
-(defun add-next-fn (&key transform)
-  (lambda (current next)
-    (let ((current-value (if transform (funcall transform current) current))
-          (next-value (if (and next transform) (funcall transform next) next)))
-      (cons current-value next-value))))
-
-(defun pair-elements-with-mapcar (lst &key transform)
-  (mapcar (add-next-fn :transform transform)
-          lst
-          (append (cdr lst) (list nil)))) 
+ (defun add-next-fn (&key transform)
+            (let ((prev-element nil))
+              (lambda (current)
+                (if (null prev-element)
+                    (setf prev-element (cons (if transform (funcall transform current) current) nil))
+                    (progn (setf (cdr prev-element) (if transform (funcall transform current) current))
+                           (setf current (cons (cdr prev-element) nil))
+                           (setf prev-element current)))))) 
 ```
 ### Тестові набори та утиліти другої частини 
 ```lisp
 (defun check-pair-elements-with-mapcar (name input expected &key transform)
   "Execute  add-next-fn on input, compare result with expected and print comparison status"
-  (let ((result (pair-elements-with-mapcar input :transform transform)))
+  (let ((result (mapcar (add-next-fn :transform transform) input))) 
     (format t "~:[~a failed! Expected: ~a Obtained: ~a~;~a passed! Expected: ~a Obtained: ~a~]~%"
             (equal result expected)
             name expected result)))
