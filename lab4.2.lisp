@@ -1,12 +1,12 @@
 (defun add-next-fn (&key transform)
-  (let ((prev-element nil))
+  (let ((prev nil))
     (lambda (current)
-      (if (null prev-element)
-          (setf prev-element (cons (if transform (funcall transform current) current) nil))
+      (if (null prev)
+          (setf prev (cons (if transform (funcall transform current) current) nil))
           (progn
-            (setf (cdr prev-element) (if transform (funcall transform current) current))
-            (setf current (cons (cdr prev-element) nil))
-            (setf prev-element current)))))) 
+            (setf (cdr prev) (if transform (funcall transform current) current))
+            (setf current (cons (cdr prev) nil))
+            (setf prev current)))))) 
 
 (defun check-add-next-fn (name input expected &key transform)
   "Execute  add-next-fn on input, compare result with expected and print comparison status"
