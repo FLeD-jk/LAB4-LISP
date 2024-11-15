@@ -104,14 +104,14 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
 ## Лістинг реалізації другої частини завдання
 ```lisp
 (defun add-next-fn (&key transform)
-  (let ((prev-element nil))
+  (let ((prev nil))
     (lambda (current)
-      (if (null prev-element)
-          (setf prev-element (cons (if transform (funcall transform current) current) nil))
+      (if (null prev)
+          (setf prev (cons (if transform (funcall transform current) current) nil))
           (progn
-            (setf (cdr prev-element) (if transform (funcall transform current) current))
-            (setf current (cons (cdr prev-element) nil))
-            (setf prev-element current)))))) 
+            (setf (cdr prev) (if transform (funcall transform current) current))
+            (setf current (cons (cdr prev) nil))
+            (setf prev current)))))) 
 ```
 ### Тестові набори та утиліти другої частини 
 ```lisp
