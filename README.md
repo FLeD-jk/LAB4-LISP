@@ -108,10 +108,10 @@ CL-USER> (mapcar (add-next-fn :transform #'1+) '(1 2 3))
     (lambda (current)
       (if (null prev)
           (setf prev (cons (if transform (funcall transform current) current) nil))
-          (progn
-            (setf (cdr prev) (if transform (funcall transform current) current))
-            (setf current (cons (cdr prev) nil))
-            (setf prev current)))))) 
+          (setf (cdr prev) (if transform (funcall transform current) current)
+                current (cons (cdr prev) nil)
+                prev current))
+      ))) 
 ```
 ### Тестові набори та утиліти другої частини 
 ```lisp
